@@ -1,0 +1,248 @@
+<!DOCTYPE html> 
+<head> 
+<meta charset=utf-8> 
+<title>Level3</title>
+<script src="jquery-2.0.0.min.js"></script>
+
+<style type="text/css">
+body{background-color:#efefef;}
+#c1{position:absolute;top:0;left:0;border-style:solid;border-color:#00cc99;border-width:10px;z-index:0;}  #c3{z-index:2;}#c2{z-index:3;} #c5{z-index:-1;}
+#c6{z-index:-2;}#c7{z-index:4;}
+#wa{background-color:#66ff00;}
+#c4,#c5,#c6 {position:absolute;top:10px;left:10px;}  #c2{position:absolute;top:470px;left:0;}
+#c7{position:absolute;top:0px;left:820px;}
+#op{position:absolute;top:200px;left:10000px;}
+#next{position:absolute;left:10000px;}
+  .dow{display:block;width:202px;height:52px; line-height:52px; text-align:center; font-family:arial,verdana,sans-serif, '黑体'; font-weight:bold; font-size:22px; background:#009966;color:#fff; text-decoration:none; border-style: none; cursor:pointer}
+  .dow:hover{background:#00cc66;}
+  .dow:active{background:#009966;}
+</style>
+</head>
+<body>
+
+
+
+<canvas id="c1" width="800" height="450" ></canvas>
+<canvas id="c2" width="800" height="100" ></canvas>
+<canvas id="c3" width="800" height="450" ></canvas>
+<canvas id="c4" width="1300px" height="600px" ></canvas>
+<canvas id="c5" width="800px" height="450px" ></canvas>
+<canvas id="c6" width="800px" height="460px" ></canvas>
+<canvas id="c7" width="80px" height="460px" ></canvas>
+<div id="op">
+<button onclick="judge()" class="dow"> Shoot!</button> 
+<button onclick="location.reload();" class="dow">Restart</button>
+<button onclick="" class="dow" id="next"> Next Level</button> 
+</div>
+
+
+
+<script type="text/javascript">
+var timer = null;
+ var canvas = document.getElementById('c1');//ball
+ var c1=canvas.getContext("2d");
+ var canvas = document.getElementById('c2');//wing
+ var c2=canvas.getContext("2d");
+ var canvas = document.getElementById('c3');//door
+ var c3=canvas.getContext("2d");
+ var canvas = document.getElementById('c4');//bottom
+ var c4=canvas.getContext("2d");
+ var canvas = document.getElementById('c5');//switch
+ var c5=canvas.getContext("2d");
+ var canvas = document.getElementById('c6');//tp
+ var c6=canvas.getContext("2d");
+ var canvas = document.getElementById('c7');//wing2
+ var c7=canvas.getContext("2d");
+
+ var width=800;		//区域宽度
+ var height=450;	//区域高度
+ var X=21;//球x坐标
+ var Y=400; //球y坐标
+ var mx=15;			//x速度分量
+ var my=0;			//y速度分量
+ var wing=200; 
+ var wing2=200; //吹风区
+ var move =0;//拖拽状态
+var A=1400;
+var B=500;
+var run=0;  //运行状态
+var start;
+var light=0;
+
+window.onload = function(){
+	timer = setInterval(start,60);
+	flash = setInterval(open,500);
+};
+
+function judge(){
+if(run==0)
+	{start=setInterval(draw,60);
+	run=1;}
+}
+
+function start(){
+c4.clearRect(0,0,1300,600)	
+  c4.beginPath();					
+ c4.fillStyle="#00cc99";				
+  c4.arc(A,300,B,0,Math.PI*2,1); 
+ c4.fillRect(0,220,150,10); //地形
+  c4.closePath();					
+  c4.fill();						
+  A=A+3;B=B+2;
+     if(A>1500){
+	 window.clearInterval(timer); 
+	
+	  $("#op").css("left","1000px");
+   }
+}
+
+function open(){
+
+ c5.clearRect(0,0,800,450);
+if (light==1){
+c5.beginPath();	
+c5.fillStyle="#3399ff"; 
+c5.fillRect(700,220,30,30);  
+light=0;
+}
+else if(light==0){
+c5.beginPath();	
+c5.fillStyle="#00ccff"; 
+c5.fillRect(700,220,30,30);  
+light=1;}//画开关
+
+else {
+c5.beginPath();	
+c5.fillStyle="#00ccff"; 
+c5.fillRect(700,220,30,30);  
+}
+}
+
+c2.fillStyle="#ccff00"; //画出风口1
+c2.fillRect(200,0,80,100);
+c7.fillStyle="#ffcc00"; //画出风口2
+c7.fillRect(0,200,100,80);  
+
+
+c3.beginPath();					//出口
+ c3.fillStyle="#ff7d7d";		
+ c3.arc(40,410,30,0,Math.PI*2,1);
+c3.closePath();					
+ c3.fill();						
+
+
+
+
+function draw()
+{
+ c1.clearRect(0,0,width,height)	
+ c1.beginPath();					//从新开始画
+ c1.fillStyle="#6ae6ab";				//定义颜色
+ c1.arc(X,Y,20,0,Math.PI*2,1); //画球
+c1.closePath();					//结束画布
+ c1.fill();						//结束渲染
+
+ X=X+mx;
+Y=Y+my;
+
+if (mx>0){mx=mx-0.01*mx;}else if(mx<0){mx=mx-0.01*mx;}
+
+if(my>0){my=my-0.01*my;}else if(my<0){my=my-0.006*my;}//摩擦力
+
+ if(Y>=wing2 && Y<=wing2+80){mx=mx-0.9;}
+ if(X>=wing && X<=wing+80){my=my-0.9;}//风力
+	 if(X<=20 || X>=width-20){mx=mx*-1;}
+
+	  if(Y<=20 || Y>=height-20){ my=my*-1; }//弹力
+
+	 if(X>=20 && X<=150 && Y>=220 && Y<=250){ my=my*-1; }
+	 if(Y>201 && Y<229 && X<=170){ my=my*-1; }//地形弹力
+
+	 if(X>=20 && X<=60 && Y>=390 && Y<=430 && light==2)
+	 {
+		 clearInterval(start);
+		 c1.clearRect(0,0,width,height)	
+		 c1.beginPath();				
+		 c1.fillStyle="#00ff00";			
+		 c1.arc(40,410,20,0,Math.PI*2,1); 
+		 c1.closePath();				
+		 c1.fill();	
+		 $("#next").css("position","relative");
+		  $("#next").css("left","0");
+	 }//过关
+	
+	 if(X>=350 && X<=390 && Y>=430)
+	 {
+		 X=280;Y=390;
+		 mx=-7;my=0;
+	 }//传送
+
+		if(X>=700 && X<=730 && Y>=220 && Y<=250)
+	 {
+		    light=2;
+			c3.beginPath();					//打开出口
+			c3.fillStyle="#00ccff";				
+			c3.arc(40,410,30,0,Math.PI*2,1);
+			c3.closePath();					
+			c3.fill();						
+	 }
+}
+
+$("#c2").mousemove(function(e){
+  var mouseX = e.pageX - this.offsetLeft;
+  if (move && run==0)
+  {
+ c2.clearRect(0,0,800,100)	
+ c2.beginPath();			
+ c2.fillStyle="#ccff00"; 
+ c2.fillRect(mouseX - 40,0,80,100); 
+ c2.closePath();			
+ c2.fill(); 
+ wing=mouseX - 40;
+ }	
+});
+
+$("#c2").mousedown(function(e){
+  var mouseX = e.pageX - this.offsetLeft;
+  if (mouseX>=wing && mouseX<=wing +80){move=1;}
+});
+
+$("#c2").mouseup(function(e){
+move=0;
+});
+
+
+$("#c7").mousemove(function(a){
+  var mouseY = a.pageY - this.offsetTop;
+  if (move && run==0)
+  {
+ c7.clearRect(0,0,80,460)	
+ c7.beginPath();			
+ c7.fillStyle="#ffcc33"; 
+ c7.fillRect(0,mouseY - 40,80,80); 
+ c7.closePath();			
+ c7.fill(); 
+ wing2=mouseY - 40;
+ }	
+});
+
+$("#c7").mousedown(function(a){
+  var mouseY = a.pageY - this.offsetTop;
+  if (mouseY>=wing2 && mouseY<=wing2 +80){move=1;}
+});
+
+$("#c7").mouseup(function(a){
+move=0;
+});
+
+
+</script>
+
+</body> 
+</html> 
+
+
+ 
+
+
+
